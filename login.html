@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Admin - Lantama Wisata Comal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
+          colors: { brand: { dark: '#0a2f24', primary: '#0f4c3a', gold: '#c59b27' } }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-gray-100 font-sans flex items-center justify-center min-h-screen p-4">
+
+  <div class="bg-white p-8 rounded-3xl shadow-xl max-w-sm w-full border text-center">
+    <!-- Logo -->
+    <img src="image_302356.png" alt="Logo" class="h-16 mx-auto mb-4 object-contain" onerror="this.style.display='none'">
+    <h1 class="text-xl font-extrabold text-brand-dark mb-1">Admin Control Panel</h1>
+    <p class="text-xs text-gray-500 mb-6">PT. Lantabur Utama Wisata Cabang Comal</p>
+
+    <form onsubmit="handleLocalLogin(event)" class="space-y-4 text-left">
+      <div>
+        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Username Admin</label>
+        <input id="username" type="text" required placeholder="admincomal" class="w-full bg-gray-50 border rounded-xl p-3 text-xs focus:ring-2 focus:ring-brand-primary outline-none">
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Password</label>
+        <input id="password" type="password" required placeholder="••••••••" class="w-full bg-gray-50 border rounded-xl p-3 text-xs focus:ring-2 focus:ring-brand-primary outline-none">
+      </div>
+
+      <p id="error-msg" class="text-red-500 text-xs font-bold hidden text-center bg-red-50 p-2 rounded-lg border border-red-200">
+        Username atau Password salah!
+      </p>
+
+      <button type="submit" class="w-full bg-brand-primary hover:bg-brand-dark text-white font-bold py-3 rounded-xl text-xs transition shadow-md">
+        Masuk ke Panel
+      </button>
+    </form>
+  </div>
+
+  <script>
+    // USERNAME & PASSWORD ADMIN (BISA DIGANTI SESUAI KEINGINAN)
+    const USER_ADMIN = "admincomal";
+    const PASS_ADMIN = "lantabur2026";
+
+    // Cek jika sudah login sebelumnya, langsung lempar ke admin.html
+    if (localStorage.getItem('admin_login_session') === 'true') {
+      window.location.href = "admin.html";
+    }
+
+    function handleLocalLogin(e) {
+      e.preventDefault();
+      const u = document.getElementById('username').value;
+      const p = document.getElementById('password').value;
+      const errorEl = document.getElementById('error-msg');
+
+      if (u === USER_ADMIN && p === PASS_ADMIN) {
+        localStorage.setItem('admin_login_session', 'true');
+        localStorage.setItem('admin_username', u);
+        window.location.href = "admin.html";
+      } else {
+        errorEl.classList.remove('hidden');
+      }
+    }
+  </script>
+</body>
+</html>

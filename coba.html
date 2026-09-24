@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PT. Lantabur Utama Wisata - Cabang Comal | Umroh & Haji Khusus Resmi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
+          colors: {
+            brand: { dark: '#0a2f24', primary: '#0f4c3a', accent: '#d4a373', gold: '#c59b27', light: '#f2f7f4' }
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.4s ease-out forwards',
+            'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+            'bounce-slow': 'bounce 2s infinite'
+          },
+          keyframes: {
+            fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+            slideUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .nav-item { position: relative; transition: color 0.3s ease; }
+    .nav-item::after {
+      content: ''; position: absolute; bottom: -4px; left: 50%; width: 0; height: 3px;
+      background-color: #c59b27; border-radius: 99px; transition: all 0.3s ease; transform: translateX(-50%);
+    }
+    .nav-item.active { color: #0f4c3a; font-weight: 700; }
+    .nav-item.active::after { width: 100%; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f1f1; }
+    ::-webkit-scrollbar-thumb { background: #0f4c3a; border-radius: 4px; }
+    .hero-bg-slide { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transition: opacity 1.5s ease-in-out; }
+    .hero-bg-slide.active { opacity: 0.25; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased flex flex-col min-h-screen relative">
+
+  <!-- Social Proof Toast -->
+  <div id="toast-social-proof" class="fixed bottom-24 left-4 z-50 bg-white/95 backdrop-blur-md p-3.5 rounded-2xl shadow-2xl border border-gray-200 max-w-sm hidden items-center space-x-3 transition-all duration-500 transform translate-y-10 opacity-0">
+    <div class="w-10 h-10 rounded-full bg-brand-gold/20 text-brand-dark flex items-center justify-center font-bold text-base shrink-0">
+      <i class="fas fa-check-circle text-brand-primary"></i>
+    </div>
+    <div class="flex-grow pr-2">
+      <p id="toast-text" class="text-xs text-gray-800 font-semibold leading-tight"></p>
+      <span id="toast-time" class="text-[10px] text-gray-400 font-bold mt-1 block"></span>
+    </div>
+    <button onclick="hideSocialProofToast()" class="text-gray-400 hover:text-gray-600 text-xs font-bold p-1">&times;</button>
+  </div>
+
+  <!-- Floating WA Button -->
+  <div class="fixed bottom-6 right-6 z-50 flex items-center group">
+    <div class="hidden md:flex bg-white text-gray-800 text-xs font-bold px-3 py-2 rounded-xl shadow-lg border border-gray-100 mr-3 items-center space-x-2 animate-fade-in">
+      <span class="w-2.5 h-2.5 bg-green-500 rounded-full animate-ping"></span>
+      <span>Admin Comal Online — Siap Bantu!</span>
+    </div>
+    <a id="floating-wa-btn" href="#" target="_blank" class="bg-green-500 hover:bg-green-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition transform hover:scale-110 animate-bounce-slow">
+      <i class="fab fa-whatsapp text-3xl"></i>
+    </a>
+  </div>
+
+  <!-- Top Announcement Bar -->
+  <div class="bg-brand-dark text-white text-xs py-2.5 px-4 shadow-inner">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
+      <div class="flex items-center space-x-4">
+        <span class="flex items-center"><i class="fas fa-certificate text-brand-gold mr-1.5"></i> Izin Resmi PPIU No. U.421 / PIHK No. HK.302</span>
+        <span class="hidden lg:inline text-gray-600">|</span>
+        <!-- ID DINAMIS DITAMBAHKAN AGAR ALAMAT TERSAMBUNG KE SCRIPT -->
+        <span class="hidden lg:flex items-center">
+          <i class="fas fa-map-marker-alt text-brand-gold mr-1.5"></i> 
+          <span id="display-alamat-header">Jl. Raya Comal No. 88, Kuto, Kec. Comal, Kabupaten Pemalang, Jawa Tengah 52363</span>
+        </span>
+      </div>
+      <div class="flex items-center space-x-4">
+        <span class="flex items-center"><i class="fas fa-clock text-brand-gold mr-1.5"></i> Buka Setiap Hari: 08.00 - 16.30 WIB</span>
+        <a id="top-wa-btn" href="#" target="_blank" class="bg-brand-gold hover:bg-yellow-600 text-brand-dark font-bold px-3 py-1 rounded transition shadow">
+          <i class="fab fa-whatsapp mr-1"></i> Hotline Comal
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header Navigation -->
+  <header class="bg-white shadow-md sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-20">
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('beranda')">
+          <div class="h-12 w-auto flex items-center justify-center shrink-0">
+            <img src="image_302356.png" alt="Lantama Wisata Logo" class="h-12 w-auto object-contain" onerror="this.style.display='none'">
+          </div>
+          <div>
+            <span class="text-xl font-extrabold text-brand-primary block leading-tight">LANTAMA WISATA</span>
+            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">PT. Lantabur Utama Wisata - Cabang Comal</span>
+          </div>
+        </div>
+
+        <nav class="hidden lg:flex space-x-6 font-medium text-sm text-gray-700">
+          <button onclick="switchTab('beranda')" id="nav-beranda" class="nav-item active py-2">Beranda</button>
+          <button onclick="switchTab('paket-umroh')" id="nav-paket-umroh" class="nav-item py-2">Paket Umrah</button>
+          <button onclick="switchTab('haji-khusus')" id="nav-haji-khusus" class="nav-item py-2">Haji Khusus</button>
+          <button onclick="switchTab('fasilitas')" id="nav-fasilitas" class="nav-item py-2">Fasilitas</button>
+          <button onclick="switchTab('galeri')" id="nav-galeri" class="nav-item py-2">Galeri</button>
+          <button onclick="switchTab('testimoni')" id="nav-testimoni" class="nav-item py-2">Testimoni</button>
+          <button onclick="switchTab('faq')" id="nav-faq" class="nav-item py-2">FAQ</button>
+        </nav>
+
+        <a id="header-wa-btn" href="#" target="_blank" class="hidden sm:inline-flex items-center justify-center bg-brand-primary hover:bg-brand-dark text-white font-semibold px-5 py-2.5 rounded-xl shadow-md transition transform hover:-translate-y-0.5">
+          <i class="fab fa-whatsapp mr-2 text-green-400 text-lg"></i> Konsultasi Gratis
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-grow">
+    <!-- SEKSI 1: BERANDA -->
+    <section id="section-beranda" class="tab-content animate-fade-in">
+      <div class="relative bg-brand-dark text-white py-16 md:py-24 overflow-hidden">
+        <div id="hero-bg-container" class="absolute inset-0"></div>
+
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+          <span class="bg-brand-gold/20 text-brand-gold border border-brand-gold/30 text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full inline-block mb-4">
+            Biro Perjalanan Umrah & Haji Khusus Terpercaya
+          </span>
+          <h1 class="text-3xl md:text-5xl font-extrabold leading-tight mb-4">
+            Melayani Setulus Hati, Memberikan yang Terbaik Untuk Tamu Allah
+          </h1>
+          <p class="text-gray-300 text-sm md:text-base mb-8 max-w-2xl mx-auto leading-relaxed">
+            Daftar ibadah Umrah dan Haji Khusus Anda bersama PT. Lantabur Utama Wisata Cabang Comal. Maskapai penerbangan ternama, hotel nyaman, dan bimbingan ibadah terpercaya.
+          </p>
+          <div class="flex flex-wrap justify-center gap-4">
+            <button onclick="switchTab('paket-umroh')" class="bg-brand-gold hover:bg-yellow-600 text-brand-dark font-extrabold px-6 py-3 rounded-xl shadow-lg transition transform hover:scale-105">
+              Lihat Paket Keberangkatan
+            </button>
+            <button onclick="switchTab('testimoni')" class="bg-white/10 hover:bg-white/20 text-white border border-white/30 font-semibold px-6 py-3 rounded-xl backdrop-blur transition">
+              Ulasan Jemaah Comal
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white py-6 border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <p class="text-center text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-4">Layanan Terdaftar & Terakreditasi Resmi</p>
+          <div class="flex flex-wrap items-center justify-center gap-6 md:gap-12 opacity-80 text-brand-dark font-bold text-xs md:text-sm">
+            <span class="flex items-center"><i class="fas fa-award text-brand-gold text-base mr-2"></i> Akreditasi A Kemenag RI</span>
+            <span class="flex items-center"><i class="fas fa-plane-departure text-brand-gold text-base mr-2"></i> Partner Saudia Airlines</span>
+            <span class="flex items-center"><i class="fas fa-shield-alt text-brand-gold text-base mr-2"></i> IATA Accredited Agent</span>
+            <span class="flex items-center"><i class="fas fa-users text-brand-gold text-base mr-2"></i> Anggota AMPHURI</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Google Review Widget -->
+      <div class="bg-brand-light py-8 border-b">
+        <div class="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
+          <div class="flex items-center space-x-4">
+            <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow border p-2 shrink-0">
+              <i class="fab fa-google text-2xl text-blue-500"></i>
+            </div>
+            <div>
+              <div class="flex items-center space-x-1 text-yellow-500 text-sm font-bold">
+                <span id="display-rating">4.9</span>
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+              </div>
+              <p class="text-xs font-bold text-gray-800 mt-0.5">Ulasan Google Maps Cabang Comal</p>
+              <p class="text-[10px] text-gray-500">Berdasarkan 120+ ulasan jemaah asli Pemalang & Pekalongan</p>
+            </div>
+          </div>
+          <a id="google-review-link" href="#" target="_blank" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs px-4 py-2.5 rounded-xl border transition flex items-center shrink-0">
+            <i class="fas fa-external-link-alt mr-2 text-gray-500"></i> Lihat Ulasan Google
+          </a>
+        </div>
+      </div>
+
+      <div class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center mb-12">
+            <span class="bg-brand-gold/20 text-brand-dark font-extrabold text-xs uppercase px-3 py-1 rounded-full inline-block mb-2">Proses Transparan</span>
+            <h2 class="text-2xl md:text-3xl font-extrabold text-brand-dark">4 Langkah Mudah Mendaftar Ibadah</h2>
+            <p class="text-gray-600 text-xs md:text-sm mt-1">Kemudahan proses pendaftaran bagi calon jemaah di Comal dan sekitarnya</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-white p-6 rounded-2xl border text-center shadow-sm relative">
+              <span class="w-8 h-8 bg-brand-gold text-brand-dark font-black rounded-full flex items-center justify-center mx-auto mb-4 text-sm">1</span>
+              <h3 class="font-bold text-brand-dark mb-1 text-sm">Konsultasi Paket</h3>
+              <p class="text-xs text-gray-500">Pilih paket ibadah via website, WhatsApp, atau datang ke kantor Comal.</p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl border text-center shadow-sm relative">
+              <span class="w-8 h-8 bg-brand-gold text-brand-dark font-black rounded-full flex items-center justify-center mx-auto mb-4 text-sm">2</span>
+              <h3 class="font-bold text-brand-dark mb-1 text-sm">Penyerahan Berkas</h3>
+              <p class="text-xs text-gray-500">Kirim berkas ke kantor atau manfaatkan layanan antar-jemput tim Comal.</p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl border text-center shadow-sm relative">
+              <span class="w-8 h-8 bg-brand-gold text-brand-dark font-black rounded-full flex items-center justify-center mx-auto mb-4 text-sm">3</span>
+              <h3 class="font-bold text-brand-dark mb-1 text-sm">Bimbingan Manasik</h3>
+              <p class="text-xs text-gray-500">Mengikuti pelatihan teori & praktik ibadah sesuai sunnah di Comal.</p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl border text-center shadow-sm relative">
+              <span class="w-8 h-8 bg-brand-primary text-white font-black rounded-full flex items-center justify-center mx-auto mb-4 text-sm"><i class="fas fa-check"></i></span>
+              <h3 class="font-bold text-brand-dark mb-1 text-sm">Keberangkatan</h3>
+              <p class="text-xs text-gray-500">Berangkat dengan tenang didampingi Tour Leader & Muthawif resmi.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEKSI 2: KATALOG PAKET UMROH -->
+    <section id="section-paket-umroh" class="tab-content animate-fade-in py-12 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-8">
+          <h2 class="text-2xl md:text-3xl font-extrabold text-brand-dark">Katalog Paket Umrah Cabang Comal</h2>
+          <p class="text-gray-600 text-xs md:text-sm mt-1">Pilih paket ibadah sesuai jadwal, hotel, dan maskapai favorit Anda</p>
+        </div>
+
+        <div class="bg-white p-4 md:p-5 rounded-2xl shadow-sm border mb-8 max-w-3xl mx-auto">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">Filter Bulan</label>
+              <select id="filter-bulan" onchange="filterPaket()" class="w-full bg-gray-50 border rounded-xl p-2.5 text-xs focus:ring-brand-primary font-medium">
+                <option value="semua">Semua Bulan</option>
+                <option value="Oktober">Oktober</option>
+                <option value="November">November</option>
+                <option value="Desember">Desember</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">Filter Maskapai</label>
+              <select id="filter-maskapai" onchange="filterPaket()" class="w-full bg-gray-50 border rounded-xl p-2.5 text-xs focus:ring-brand-primary font-medium">
+                <option value="semua">Semua Maskapai</option>
+                <option value="Saudia">Saudia Airlines</option>
+                <option value="Garuda">Garuda Indonesia</option>
+                <option value="Oman">Oman Air / Royal Jordanian</option>
+              </select>
+            </div>
+            <div class="flex items-end">
+              <button onclick="resetFilter()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold p-2.5 rounded-xl text-xs transition flex items-center justify-center">
+                <i class="fas fa-undo mr-1.5"></i> Reset Filter
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="paket-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+      </div>
+    </section>
+
+    <!-- SEKSI 3: HAJI KHUSUS -->
+    <section id="section-haji-khusus" class="tab-content hidden animate-fade-in py-16 bg-white">
+      <div class="max-w-4xl mx-auto px-4">
+        <div class="bg-brand-dark text-white rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden">
+          <div class="relative z-10 text-center md:text-left">
+            <span class="bg-brand-gold text-brand-dark font-extrabold text-xs uppercase px-3 py-1 rounded-full mb-4 inline-block">Program Haji Khusus Furoda</span>
+            <h2 class="text-2xl md:text-3xl font-extrabold mb-4">Ibadah Haji Tanpa Antre Bertahun-tahun</h2>
+            <p class="text-gray-300 text-xs md:text-sm mb-6 leading-relaxed">
+              Program Haji Khusus (PIHK) dan Visa Haji Furoda Resmi terdaftar di Kementerian Agama. Tenda VIP Arafah & Mina, Penerbangan Saudia/Garuda Indonesia Direct Flight.
+            </p>
+            <a id="haji-wa-btn" href="#" target="_blank" class="bg-brand-gold hover:bg-yellow-600 text-brand-dark font-bold px-6 py-3 rounded-xl shadow transition inline-flex items-center text-xs md:text-sm">
+              <i class="fab fa-whatsapp mr-2 text-base"></i> Konsultasi Haji Khusus Now
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEKSI 4: FASILITAS LENGKAP -->
+    <section id="section-fasilitas" class="tab-content animate-fade-in py-16 bg-brand-light">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+          <span class="bg-brand-gold/20 text-brand-dark font-extrabold text-xs uppercase px-3 py-1 rounded-full inline-block mb-3 border border-brand-gold/30">
+            Fasilitas All-In Terlengkap
+          </span>
+          <h2 class="text-2xl md:text-3xl font-extrabold text-brand-dark">Fasilitas & Layanan Jemaah</h2>
+          <p class="text-gray-600 text-xs md:text-sm mt-1">20 Fasilitas lengkap dipaketkan secara utuh dan transparan</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div class="bg-white p-4.5 rounded-xl border border-gray-200 shadow-sm flex items-start space-x-3.5"><div class="w-9 h-9 rounded-lg bg-brand-primary/10 text-brand-primary flex items-center justify-center text-base font-bold shrink-0"><i class="fas fa-plane"></i></div><div><h4 class="font-bold text-gray-900 text-xs">Tiket Pesawat PP</h4><p class="text-[11px] text-gray-500 mt-0.5">Maskapai Direct / Transit Pilihan</p></div></div>
+          <div class="bg-white p-4.5 rounded-xl border border-gray-200 shadow-sm flex items-start space-x-3.5"><div class="w-9 h-9 rounded-lg bg-brand-primary/10 text-brand-primary flex items-center justify-center text-base font-bold shrink-0"><i class="fas fa-syringe"></i></div><div><h4 class="font-bold text-gray-900 text-xs">Suntik Vaksin Meningitis</h4><p class="text-[11px] text-gray-500 mt-0.5">Vaksinasi Syarat Resmi</p></div></div>
+          <div class="bg-white p-4.5 rounded-xl border border-gray-200 shadow-sm flex items-start space-x-3.5"><div class="w-9 h-9 rounded-lg bg-brand-primary/10 text-brand-primary flex items-center justify-center text-base font-bold shrink-0"><i class="fas fa-vial"></i></div><div><h4 class="font-bold text-gray-900 text-xs">Suntik Vaksin Polio</h4><p class="text-[11px] text-gray-500 mt-0.5">Pendampingan Administrasi</p></div></div>
+          <div class="bg-white p-4.5 rounded-xl border border-gray-200 shadow-sm flex items-start space-x-3.5"><div class="w-9 h-9 rounded-lg bg-brand-primary/10 text-brand-primary flex items-center justify-center text-base font-bold shrink-0"><i class="fas fa-hotel"></i></div><div><h4 class="font-bold text-gray-900 text-xs">Hotel Sesuai Program</h4><p class="text-[11px] text-gray-500 mt-0.5">Makkah & Madinah Bintang 3-5</p></div></div>
+          <div class="bg-white p-4.5 rounded-xl border border-gray-200 shadow-sm flex items-start space-x-3.5"><div class="w-9 h-9 rounded-lg bg-brand-primary/10 text-brand-primary flex items-center justify-center text-base font-bold shrink-0"><i class="fas fa-bus"></i></div><div><h4 class="font-bold text-gray-900 text-xs">Transportasi & Akomodasi</h4><p class="text-[11px] text-gray-500 mt-0.5">Bus AC VIP Mewah</p></div></div>
+          <div class="bg-white p-4.5 rounded-xl border border-gray-200 shadow-sm flex items-start space-x-3.5"><div class="w-9 h-9 rounded-lg bg-brand-primary/10 text-brand-primary flex items-center justify-center text-base font-bold shrink-0"><i class="fas fa-utensils"></i></div><div><h4 class="font-bold text-gray-900 text-xs">Makan 3X Menu Indonesia</h4><p class="text-[11px] text-gray-500 mt-0.5">Masakan Khas Nusantara</p></div></div>
+          <div class="bg-white p-4.5 rounded-xl border border-gray-200 shadow-sm flex items-start space-x-3.5"><div class="w-9 h-9 rounded-lg bg-brand-primary/10 text-brand-primary flex items-center justify-center text-base font-bold shrink-0"><i class="fas fa-passport"></i></div><div><h4 class="font-bold text-gray-900 text-xs">Visa, Paspor & Asuransi</h4><p class="text-[11px] text-gray-500 mt-0.5">Pengurusan Dokumen Utuh</p></div></div>
+          <div class="bg-white p-4.5 rounded-xl border border-gray-200 shadow-sm flex items-start space-x-3.5"><div class="w-9 h-9 rounded-lg bg-brand-primary/10 text-brand-primary flex items-center justify-center text-base font-bold shrink-0"><i class="fas fa-suitcase"></i></div><div><h4 class="font-bold text-gray-900 text-xs">Koper & Perlengkapan</h4><p class="text-[11px] text-gray-500 mt-0.5">Koper, Seragam & Ihram</p></div></div>
+          <div class="bg-white p-4.5 rounded-xl border border-gray-200 shadow-sm flex items-start space-x-3.5"><div class="w-9 h-9 rounded-lg bg-brand-primary/10 text-brand-primary flex items-center justify-center text-base font-bold shrink-0"><i class="fas fa-concierge-bell"></i></div><div><h4 class="font-bold text-gray-900 text-xs">Handling Selama di Saudi</h4><p class="text-[11px] text-gray-500 mt-0.5">Handling Bandara & Bagasi</p></div></div>
+          <div class="bg-white p-4.5 rounded-xl border border-gray-200 shadow-sm flex items-start space-x-3.5"><div class="w-9 h-9 rounded-lg bg-brand-primary/10 text-brand-primary flex items-center justify-center text-base font-bold shrink-0"><i class="fas fa-user-tie"></i></div><div><h4 class="font-bold text-gray-900 text-xs">Tour Leader Dari Indonesia</h4><p class="text-[11px] text-gray-500 mt-0.5">Pendampingan Penuh</p></div></div>
+          <div class="bg-white p-4.5 rounded-xl border border-gray-200 shadow-sm flex items-start space-x-3.5"><div class="w-9 h-9 rounded-lg bg-brand-primary/10 text-brand-primary flex items-center justify-center text-base font-bold shrink-0"><i class="fas fa-city"></i></div><div><h4 class="font-bold text-gray-900 text-xs">City Tour 3 Kota</h4><p class="text-[11px] text-gray-500 mt-0.5">Madinah - Makkah - Jeddah</p></div></div>
+          <div class="bg-white p-4.5 rounded-xl border border-gray-200 shadow-sm flex items-start space-x-3.5"><div class="w-9 h-9 rounded-lg bg-brand-primary/10 text-brand-primary flex items-center justify-center text-base font-bold shrink-0"><i class="fas fa-bottle-water"></i></div><div><h4 class="font-bold text-gray-900 text-xs">Air Zam - Zam 5 Liter</h4><p class="text-[11px] text-gray-500 mt-0.5">Oleh-Oleh Zamzam Asli</p></div></div>
+          <div class="bg-white p-4.5 rounded-xl border border-gray-200 shadow-sm flex items-start space-x-3.5"><div class="w-9 h-9 rounded-lg bg-brand-primary/10 text-brand-primary flex items-center justify-center text-base font-bold shrink-0"><i class="fas fa-certificate"></i></div><div><h4 class="font-bold text-gray-900 text-xs">Sertifikat Umroh & Badal</h4><p class="text-[11px] text-gray-500 mt-0.5">Dokumen Kenangan Ibadah</p></div></div>
+          <div class="bg-white p-4.5 rounded-xl border border-gray-200 shadow-sm flex items-start space-x-3.5"><div class="w-9 h-9 rounded-lg bg-brand-primary/10 text-brand-primary flex items-center justify-center text-base font-bold shrink-0"><i class="fas fa-book-open"></i></div><div><h4 class="font-bold text-gray-900 text-xs">Album Foto Cetak</h4><p class="text-[11px] text-gray-500 mt-0.5">Dokumentasi Kenangan</p></div></div>
+          <div class="bg-white p-4.5 rounded-xl border border-gray-200 shadow-sm flex items-start space-x-3.5"><div class="w-9 h-9 rounded-lg bg-brand-primary/10 text-brand-primary flex items-center justify-center text-base font-bold shrink-0"><i class="fas fa-chalkboard-teacher"></i></div><div><h4 class="font-bold text-gray-900 text-xs">Bimbingan Manasik</h4><p class="text-[11px] text-gray-500 mt-0.5">Teori & Praktik di Comal</p></div></div>
+          <div class="bg-white p-4.5 rounded-xl border border-gray-200 shadow-sm flex items-start space-x-3.5"><div class="w-9 h-9 rounded-lg bg-brand-primary/10 text-brand-primary flex items-center justify-center text-base font-bold shrink-0"><i class="fas fa-bed"></i></div><div><h4 class="font-bold text-gray-900 text-xs">1 Malam Menginap Hotel JKT</h4><p class="text-[11px] text-gray-500 mt-0.5">Transit Menginap Pre-Flight</p></div></div>
+          <div class="bg-white p-4.5 rounded-xl border border-gray-200 shadow-sm flex items-start space-x-3.5"><div class="w-9 h-9 rounded-lg bg-brand-primary/10 text-brand-primary flex items-center justify-center text-base font-bold shrink-0"><i class="fas fa-box"></i></div><div><h4 class="font-bold text-gray-900 text-xs">2X Nasi Box Pre-Departure</h4><p class="text-[11px] text-gray-500 mt-0.5">Konsumsi Pre-Departure</p></div></div>
+          <div class="bg-white p-4.5 rounded-xl border border-gray-200 shadow-sm flex items-start space-x-3.5"><div class="w-9 h-9 rounded-lg bg-brand-primary/10 text-brand-primary flex items-center justify-center text-base font-bold shrink-0"><i class="fas fa-cookie-byte"></i></div><div><h4 class="font-bold text-gray-900 text-xs">Snack Box Perjalanan</h4><p class="text-[11px] text-gray-500 mt-0.5">Makanan Ringan Transport</p></div></div>
+          <div class="bg-white p-4.5 rounded-xl border border-gray-200 shadow-sm flex items-start space-x-3.5"><div class="w-9 h-9 rounded-lg bg-brand-primary/10 text-brand-primary flex items-center justify-center text-base font-bold shrink-0"><i class="fas fa-glass-cheers"></i></div><div><h4 class="font-bold text-gray-900 text-xs">Welcome Drink Kedatangan</h4><p class="text-[11px] text-gray-500 mt-0.5">Minuman Segar Sambutan</p></div></div>
+          <div class="bg-white p-4.5 rounded-xl border-2 border-brand-gold shadow-sm flex items-start space-x-3.5"><div class="w-9 h-9 rounded-lg bg-brand-gold text-brand-dark flex items-center justify-center text-base font-bold shrink-0"><i class="fas fa-hands-helping"></i></div><div><h4 class="font-bold text-gray-900 text-xs">Layanan Cabang Comal</h4><p class="text-[11px] text-gray-500 mt-0.5">Layanan Antar-Jemput Berkas</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEKSI 5: GALERI -->
+    <section id="section-galeri" class="tab-content animate-fade-in py-16 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+          <span class="bg-brand-gold/20 text-brand-dark font-extrabold text-xs uppercase px-3 py-1 rounded-full inline-block mb-3 border border-brand-gold/30">
+            Dokumentasi Kegiatan
+          </span>
+          <h2 class="text-2xl md:text-3xl font-extrabold text-brand-dark">Galeri Perjalanan Jemaah</h2>
+          <p class="text-gray-600 text-xs md:text-sm mt-1">Momen kenangan ibadah jemaah PT. Lantabur Utama Wisata</p>
+        </div>
+        <div id="galeri-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+      </div>
+    </section>
+
+    <!-- SEKSI 6: TESTIMONI -->
+    <section id="section-testimoni" class="tab-content animate-fade-in py-16 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+          <span class="bg-brand-gold/20 text-brand-dark font-extrabold text-xs uppercase px-3 py-1 rounded-full inline-block mb-3 border border-brand-gold/30">
+            Ulasan Kepuasan
+          </span>
+          <h2 class="text-2xl md:text-3xl font-extrabold text-brand-dark">Kata Jemaah Asal Comal & Pemalang</h2>
+          <p class="text-gray-600 text-xs md:text-sm mt-1">Pengalaman ibadah jemaah yang telah memberangkatkan diri bersama kami</p>
+        </div>
+        <div id="testimoni-container" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+      </div>
+    </section>
+
+    <!-- SEKSI 7: FAQ -->
+    <section id="section-faq" class="tab-content animate-fade-in py-16 bg-white">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10">
+          <span class="bg-brand-gold/20 text-brand-dark font-extrabold text-xs uppercase px-3 py-1 rounded-full inline-block mb-2 border border-brand-gold/30">
+            Pusat Informasi
+          </span>
+          <h2 class="text-2xl md:text-3xl font-extrabold text-brand-dark">Pertanyaan Sering Diajukan (FAQ)</h2>
+        </div>
+        <div id="faq-container" class="space-y-3"></div>
+      </div>
+    </section>
+
+    <!-- SEKSI 8: HUBUNGI KAMI & PETA -->
+    <section id="section-hubungi-kami" class="tab-content animate-fade-in py-16 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+          <h2 class="text-2xl md:text-3xl font-extrabold text-brand-dark">Kantor Cabang Comal - Pemalang</h2>
+          <p class="text-gray-600 text-xs md:text-sm mt-1">Silakan datang langsung atau hubungi kontak resmi kami</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div class="bg-brand-light p-6 md:p-8 rounded-2xl border border-gray-200 shadow-sm flex flex-col justify-between">
+            <div>
+              <h3 class="text-lg font-bold text-brand-dark mb-5 flex items-center">
+                <i class="fas fa-building text-brand-gold mr-2.5"></i> PT. Lantabur Utama Wisata - Cabang Comal
+              </h3>
+              <div class="space-y-3.5 text-xs md:text-sm text-gray-700 mb-6">
+                <div class="flex items-start">
+                  <i class="fas fa-map-marker-alt text-brand-primary w-5 mt-1 shrink-0"></i>
+                  <div>
+                    <strong>Alamat Kantor:</strong><br>
+                    <span id="display-alamat">Jl. Raya Comal No. 88, Kuto, Kec. Comal, Kabupaten Pemalang, Jawa Tengah 52363</span>
+                  </div>
+                </div>
+                <div class="flex items-center">
+                  <i class="fas fa-phone-alt text-brand-primary w-5 shrink-0"></i>
+                  <div><strong>Telepon Kantor:</strong> <span id="display-telp">(0285) 4488-9900</span></div>
+                </div>
+                <div class="flex items-center">
+                  <i class="fab fa-whatsapp text-brand-primary w-5 shrink-0"></i>
+                  <div><strong>WhatsApp Admin:</strong> <span id="display-wa">0812-3456-7890</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="w-full h-48 rounded-xl overflow-hidden shadow mb-4">
+                <iframe id="iframe-gmaps" title="Map Kantor Comal" class="w-full h-full border-0" src="https://maps.google.com/maps?q=Comal%20Pemalang&t=&z=13&ie=UTF8&iwloc=&output=embed"></iframe>
+              </div>
+              <a id="btn-route-gmaps" href="#" target="_blank" class="w-full bg-brand-gold hover:bg-yellow-600 text-brand-dark font-extrabold py-3 rounded-xl text-xs transition shadow flex items-center justify-center">
+                <i class="fas fa-directions text-base mr-2"></i> Buka Rute Navigasi Google Maps
+              </a>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 md:p-8 rounded-2xl border border-gray-200 shadow-md">
+            <h3 class="text-lg font-bold text-brand-dark mb-5">Formulir Pertanyaan & Pendaftaran</h3>
+            <form onsubmit="handleFormSubmit(event)" class="space-y-4">
+              <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Nama Lengkap</label>
+                <input id="form-nama" type="text" required placeholder="Sesuai KTP" class="w-full bg-gray-50 border border-gray-300 rounded-xl p-3 text-xs focus:ring-brand-primary">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Nomor WhatsApp</label>
+                <input id="form-wa" type="tel" required placeholder="08xxxxxxxxxx" class="w-full bg-gray-50 border border-gray-300 rounded-xl p-3 text-xs focus:ring-brand-primary">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Pesan / Pertanyaan</label>
+                <textarea id="form-pesan" rows="3" placeholder="Tanyakan seputar jadwal, paspor, atau cicilan..." class="w-full bg-gray-50 border border-gray-300 rounded-xl p-3 text-xs focus:ring-brand-primary"></textarea>
+              </div>
+              <button type="submit" class="w-full bg-brand-primary hover:bg-brand-dark text-white font-bold py-3 rounded-xl text-xs transition shadow">
+                Kirim Pesan Ke WhatsApp Admin
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL DETAIL PAKET -->
+  <div id="modal-paket" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl relative animate-slide-up max-h-[90vh] flex flex-col">
+      <div class="relative h-44 shrink-0">
+        <img id="modal-img" src="" alt="Detail Paket" class="w-full h-full object-cover">
+        <button onclick="closeModal()" class="absolute top-3 right-3 bg-black/50 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg hover:bg-black/80">&times;</button>
+        <span id="modal-taif-badge" class="absolute bottom-3 left-3 bg-brand-dark text-brand-gold text-[10px] font-extrabold px-3 py-1 rounded-full border border-brand-gold/40 shadow flex items-center hidden">
+          <i class="fas fa-map-marked-alt text-brand-gold mr-1.5"></i> FREE TAIF
+        </span>
+      </div>
+      
+      <div class="p-5 overflow-y-auto space-y-4">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 id="modal-title" class="text-xl font-bold text-brand-dark"></h3>
+            <p id="modal-date-badge" class="text-xs text-gray-500 font-semibold mt-0.5"></p>
+          </div>
+          <span id="modal-price-unit" class="text-base font-extrabold text-brand-gold"></span>
+        </div>
+
+        <div class="space-y-1.5 text-xs text-gray-700 bg-brand-light p-3 rounded-xl border">
+          <p><strong><i class="fas fa-plane text-brand-primary w-4"></i> Maskapai:</strong> <span id="modal-maskapai"></span></p>
+          <p><strong><i class="fas fa-hotel text-brand-primary w-4"></i> Hotel Makkah:</strong> <span id="modal-hotel-makkah"></span></p>
+          <p><strong><i class="fas fa-hotel text-brand-primary w-4"></i> Hotel Madinah:</strong> <span id="modal-hotel-madinah"></span></p>
+        </div>
+
+        <!-- Kalkulator Simulasi -->
+        <div class="bg-yellow-50 border border-yellow-200 p-3.5 rounded-xl">
+          <label class="block text-[11px] font-bold text-brand-dark uppercase mb-1.5">Simulasi Jumlah Jemaah / Rombongan</label>
+          <div class="flex items-center space-x-3">
+            <select id="simulasi-pendaftar" onchange="updateSimulasiHarga()" class="bg-white border rounded-lg p-2 text-xs font-bold text-brand-dark flex-grow focus:ring-brand-primary">
+              <option value="1">1 Orang (Mandiri)</option>
+              <option value="2" selected>2 Orang (Suami - Istri)</option>
+              <option value="3">3 Orang (Keluarga)</option>
+              <option value="4">4 Orang (Keluarga Besar)</option>
+            </select>
+            <div class="text-right shrink-0">
+              <span class="text-[9px] text-gray-500 block uppercase font-bold">Estimasi Biaya</span>
+              <span id="total-simulasi-harga" class="text-sm font-extrabold text-brand-primary"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inclusions & Exclusions -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div class="bg-green-50 p-3 rounded-xl border border-green-200">
+            <strong class="text-green-800 block mb-1 text-[11px]"><i class="fas fa-check-circle mr-1"></i> Sudah Termasuk:</strong>
+            <ul class="space-y-0.5 text-gray-600 list-disc list-inside max-h-32 overflow-y-auto text-[11px]"></ul>
+          </div>
+          <div class="bg-red-50 p-3 rounded-xl border border-red-200">
+            <strong class="text-red-800 block mb-1 text-[11px]"><i class="fas fa-times-circle mr-1"></i> Belum Termasuk:</strong>
+            <ul class="space-y-0.5 text-gray-600 list-disc list-inside max-h-32 overflow-y-auto text-[11px]"></ul>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
+          <a id="modal-wa-btn" href="#" target="_blank" class="text-center w-full bg-brand-primary text-white font-bold py-2.5 rounded-xl shadow hover:bg-brand-dark transition text-xs">
+            <i class="fab fa-whatsapp mr-1.5"></i> Daftar Paket via WA
+          </a>
+          <a id="modal-brosur-btn" href="#" target="_blank" class="text-center w-full bg-brand-gold text-brand-dark font-bold py-2.5 rounded-xl shadow hover:bg-yellow-600 transition text-xs">
+            <i class="fas fa-file-pdf mr-1.5"></i> Minta Brosur PDF
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-brand-dark text-white py-6 border-t-4 border-brand-gold">
+    <div class="max-w-7xl mx-auto px-4 text-center text-xs text-gray-400">
+      &copy; 2026 PT. Lantabur Utama Wisata Cabang Comal. All Rights Reserved.
+    </div>
+  </footer>
+
+  <script>
+    const defaultData = {
+      kontak: { wa: "081234567890", alamat: "Jl. Raya Comal No. 88, Kuto, Kec. Comal, Pemalang", telp: "(0285) 4488-9900", rating: "4.9", gmapsLink: "https://maps.google.com" },
+      toastDuration: 8,
+      pendaftarNotif: [
+        { text: "Bpk. H. Ahmad dari Ulujami baru saja mendaftar Paket Umrah VIP (2 Orang)", time: "12 menit yang lalu" },
+        { text: "Ibu Hj. Siti dari Comal mendaftar Paket Umrah Reguler (3 Orang)", time: "35 menit yang lalu" }
+      ],
+      paket: [
+        { id: 1, nama: "Umrah Reguler 9 Hari", tgl: "15 Oktober 2026", harga: "Rp 29,5 Jt", rawHarga: 29500000, makkah: "Al Kiswah Tower", madinah: "Concorde Hotel", maskapai: "Saudia Airlines (Direct)", foto: "https://images.unsplash.com/photo-1565552070098-fd83a8dac718?auto=format&fit=crop&q=80", badge: "SUPER HEMAT", isFreeTaif: true, seatRemaining: 3, exclusions: ["Pembuatan Paspor Pribadi", "Suntik Vaksin Meningitis", "Pengeluaran Pribadi & Tipping"] },
+        { id: 2, nama: "Umrah VIP Bintang 5 (12 Hari)", tgl: "20 November 2026", harga: "Rp 38,9 Jt", rawHarga: 38900000, makkah: "Pullman Zamzam", madinah: "Frontel Al Harithia", maskapai: "Garuda Indonesia Direct", foto: "https://images.unsplash.com/photo-1591604466107-ec97de577aff?auto=format&fit=crop&q=80", badge: "BINTANG 5 VIP", isFreeTaif: true, seatRemaining: 5, exclusions: ["Pembuatan Paspor Pribadi", "Suntik Vaksin Meningitis", "Pengeluaran Pribadi & Tipping"] }
+      ],
+      galeri: [{ id: 1, judul: "Tawaf Bersama Jemaah Comal", lokasi: "Masjidil Haram Makkah", ket: "Dokumentasi kebersamaan jemaah Cabang Comal saat Tawaf di depan Ka'bah.", foto: "https://images.unsplash.com/photo-1591604466107-ec97de577aff?auto=format&fit=crop&q=80" }],
+      testimoni: [{ id: 1, nama: "Ibu Hj. Siti Nurjanah", asal: "Kuto, Comal", ulasan: "Alhamdulillah bimbingan ibadah sangat sabar, hotel dekat sekali dengan Masjidil Haram.", foto: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80" }],
+      faq: [{ q: "Bagaimana jika saya belum memiliki paspor?", a: "Tim Cabang Comal akan memberikan surat rekomendasi resmi travel dan mengantar pengurusan paspor." }]
+    };
+
+    let activeModalPaket = null;
+    let toastIndex = 0;
+    let toastTimer = null;
+
+    function getData() {
+      const saved = localStorage.getItem('lantama_comal_cms');
+      return saved ? JSON.parse(saved) : defaultData;
+    }
+
+    function formatRupiah(number) {
+      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(number);
+    }
+
+    function renderPage() {
+      const data = getData();
+      let cleanWA = (data.kontak.wa || "081234567890").replace(/\D/g, '');
+      if (cleanWA.startsWith('0')) cleanWA = '62' + cleanWA.substring(1);
+
+      document.getElementById('display-wa').innerText = data.kontak.wa;
+      
+      // MENGHUBUNGKAN DATA ALAMAT KE TOP HEADER & KANTOR
+      const alamatElHeader = document.getElementById('display-alamat-header');
+      if (alamatElHeader) alamatElHeader.innerText = data.kontak.alamat;
+      
+      document.getElementById('display-alamat').innerText = data.kontak.alamat;
+      document.getElementById('display-telp').innerText = data.kontak.telp;
+      document.getElementById('display-rating').innerText = data.kontak.rating || "4.9";
+      
+      const gmapsLink = data.kontak.gmapsLink || "https://maps.google.com";
+      document.getElementById('google-review-link').setAttribute('href', gmapsLink);
+      document.getElementById('btn-route-gmaps').setAttribute('href', gmapsLink);
+      document.getElementById('iframe-gmaps').src = `https://maps.google.com/maps?q=${encodeURIComponent(data.kontak.alamat)}&t=&z=14&ie=UTF8&iwloc=&output=embed`;
+
+      document.getElementById('top-wa-btn').setAttribute('href', `https://wa.me/${cleanWA}`);
+      document.getElementById('header-wa-btn').setAttribute('href', `https://wa.me/${cleanWA}?text=Assalamu'alaikum,%20saya%20ingin%20konsultasi%20paket%20Umroh`);
+      document.getElementById('floating-wa-btn').setAttribute('href', `https://wa.me/${cleanWA}?text=Assalamu'alaikum%20Admin%20Comal,%20saya%20ingin%20bertanya%20seputar%20paket%20Umroh`);
+
+      renderPaketList(data.paket);
+
+      const galeriContainer = document.getElementById('galeri-container');
+      galeriContainer.innerHTML = '';
+      (data.galeri || defaultData.galeri).forEach(g => {
+        galeriContainer.innerHTML += `
+          <div class="bg-white rounded-2xl overflow-hidden shadow border border-gray-200 flex flex-col group">
+            <div class="relative h-48 overflow-hidden shrink-0">
+              <img src="${g.foto}" class="w-full h-full object-cover transition transform group-hover:scale-105 duration-300">
+              <span class="absolute bottom-3 left-3 bg-brand-dark/80 backdrop-blur text-brand-gold text-[10px] font-bold px-2.5 py-1 rounded-full"><i class="fas fa-map-marker-alt mr-1"></i> ${g.lokasi}</span>
+            </div>
+            <div class="p-4 flex-grow flex flex-col justify-between">
+              <h4 class="font-bold text-brand-dark text-sm group-hover:text-brand-primary transition">${g.judul}</h4>
+              <p class="text-xs text-gray-500 mt-1 line-clamp-2">${g.ket}</p>
+            </div>
+          </div>
+        `;
+      });
+
+      const testimoniContainer = document.getElementById('testimoni-container');
+      testimoniContainer.innerHTML = '';
+      (data.testimoni || defaultData.testimoni).forEach(t => {
+        testimoniContainer.innerHTML += `
+          <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="text-brand-gold text-xs mb-2">⭐⭐⭐⭐⭐ 5.0</div>
+              <p class="text-xs text-gray-600 italic leading-relaxed mb-4">"${t.ulasan}"</p>
+            </div>
+            <div class="flex items-center space-x-3 border-t pt-3">
+              <img src="${t.foto}" class="w-9 h-9 rounded-full object-cover shrink-0">
+              <div>
+                <h4 class="font-bold text-brand-dark text-xs">${t.nama}</h4>
+                <p class="text-[10px] text-gray-400">${t.asal}</p>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      const faqContainer = document.getElementById('faq-container');
+      faqContainer.innerHTML = '';
+      (data.faq || defaultData.faq).forEach((f, idx) => {
+        faqContainer.innerHTML += `
+          <div class="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
+            <button onclick="toggleFaq(${idx})" class="w-full text-left p-4 font-bold text-brand-dark text-xs md:text-sm flex justify-between items-center hover:bg-gray-100 transition">
+              <span>${f.q}</span>
+              <i id="faq-icon-${idx}" class="fas fa-chevron-down text-brand-gold transition-transform"></i>
+            </button>
+            <div id="faq-ans-${idx}" class="hidden p-4 pt-0 text-xs text-gray-600 border-t bg-white leading-relaxed">
+              ${f.a}
+            </div>
+          </div>
+        `;
+      });
+
+      initHeroBgSlider();
+      initSocialProofToast();
+    }
+
+    function renderPaketList(paketArray) {
+      const container = document.getElementById('paket-container');
+      container.innerHTML = '';
+
+      if (paketArray.length === 0) {
+        container.innerHTML = `<div class="col-span-3 text-center py-12 text-gray-500 font-bold">Tidak ada paket yang sesuai dengan filter.</div>`;
+        return;
+      }
+
+      paketArray.forEach(p => {
+        const taifBadgeHTML = p.isFreeTaif 
+          ? `<div class="absolute bottom-3 right-3 bg-brand-dark/90 backdrop-blur text-brand-gold text-[10px] font-extrabold px-2.5 py-1 rounded-full border border-brand-gold/40 flex items-center shadow">
+                <i class="fas fa-map-marked-alt mr-1"></i> FREE TAIF
+             </div>` : '';
+
+        container.innerHTML += `
+          <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md border border-gray-200 flex flex-col transition">
+            <div class="relative h-48 shrink-0">
+              <img src="${p.foto}" alt="${p.nama}" class="w-full h-full object-cover">
+              <span class="absolute top-3 left-3 bg-brand-gold text-brand-dark font-extrabold text-[10px] uppercase px-2.5 py-1 rounded-full shadow">${p.badge || 'Pilihan'}</span>
+              ${taifBadgeHTML}
+            </div>
+
+            <div class="p-5 flex-grow flex flex-col justify-between">
+              <div>
+                <h3 class="text-lg font-bold text-brand-dark leading-snug mb-1">${p.nama}</h3>
+                
+                <div class="flex items-center space-x-2 mb-4">
+                  <span class="bg-red-100 text-red-700 text-[10px] font-extrabold px-2 py-0.5 rounded-full">
+                    <i class="fas fa-fire mr-1"></i> Sisa ${p.seatRemaining || 3} Seat
+                  </span>
+                  <span class="text-[10px] text-gray-500 font-bold"><i class="fas fa-calendar-alt text-brand-gold mr-1"></i> ${p.tgl}</span>
+                </div>
+                
+                <div class="space-y-1.5 text-xs text-gray-700 mb-5">
+                  <div class="flex items-center"><i class="fas fa-plane text-brand-primary w-5 shrink-0"></i> <span class="font-semibold text-gray-800">${p.maskapai}</span></div>
+                  <div class="flex items-center"><i class="fas fa-hotel text-brand-primary w-5 shrink-0"></i> <span>Makkah: ${p.makkah}</span></div>
+                  <div class="flex items-center"><i class="fas fa-hotel text-brand-primary w-5 shrink-0"></i> <span>Madinah: ${p.madinah}</span></div>
+                </div>
+              </div>
+
+              <div class="border-t pt-3.5 flex justify-between items-end">
+                <div>
+                  <span class="text-[10px] text-gray-400 font-bold uppercase block">Mulai Dari</span>
+                  <span class="text-xl font-extrabold text-brand-primary">${p.harga}</span>
+                </div>
+                <button onclick="openModal(${p.id})" class="bg-brand-primary text-white font-bold px-3.5 py-2 rounded-xl text-xs hover:bg-brand-dark transition">Detail</button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function initSocialProofToast() {
+      const data = getData();
+      const list = data.pendaftarNotif || defaultData.pendaftarNotif;
+      if (!list || list.length === 0) return;
+      if (toastTimer) clearInterval(toastTimer);
+
+      const durationSec = (data.toastDuration || 8) * 1000;
+      toastTimer = setInterval(() => {
+        const item = list[toastIndex];
+        document.getElementById('toast-text').innerText = item.text;
+        document.getElementById('toast-time').innerText = item.time;
+
+        const toastEl = document.getElementById('toast-social-proof');
+        toastEl.classList.remove('hidden');
+        setTimeout(() => toastEl.classList.remove('translate-y-10', 'opacity-0'), 100);
+        setTimeout(() => hideSocialProofToast(), durationSec - 2000);
+
+        toastIndex = (toastIndex + 1) % list.length;
+      }, durationSec);
+    }
+
+    function hideSocialProofToast() {
+      const toastEl = document.getElementById('toast-social-proof');
+      toastEl.classList.add('translate-y-10', 'opacity-0');
+      setTimeout(() => toastEl.classList.add('hidden'), 500);
+    }
+
+    function filterPaket() {
+      const data = getData();
+      const bulanVal = document.getElementById('filter-bulan').value.toLowerCase();
+      const maskapaiVal = document.getElementById('filter-maskapai').value.toLowerCase();
+
+      const filtered = data.paket.filter(p => {
+        const matchBulan = bulanVal === 'semua' || p.tgl.toLowerCase().includes(bulanVal);
+        const matchMaskapai = maskapaiVal === 'semua' || p.maskapai.toLowerCase().includes(maskapaiVal);
+        return matchBulan && matchMaskapai;
+      });
+
+      renderPaketList(filtered);
+    }
+
+    function resetFilter() {
+      document.getElementById('filter-bulan').value = 'semua';
+      document.getElementById('filter-maskapai').value = 'semua';
+      renderPaketList(getData().paket);
+    }
+
+    function toggleFaq(idx) {
+      const ans = document.getElementById(`faq-ans-${idx}`);
+      const icon = document.getElementById(`faq-icon-${idx}`);
+      ans.classList.toggle('hidden');
+      icon.classList.toggle('rotate-180');
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById(`nav-${tabId}`);
+      if(activeBtn) activeBtn.classList.add('active');
+
+      if (tabId === 'beranda') {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('hidden'));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+        const targetSection = document.getElementById(`section-${tabId}`);
+        if(targetSection) {
+          targetSection.classList.remove('hidden');
+          targetSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    }
+
+    function openModal(id) {
+      const data = getData();
+      const p = data.paket.find(x => x.id === id);
+      if(!p) return;
+
+      activeModalPaket = p;
+      document.getElementById('modal-title').innerText = p.nama;
+      document.getElementById('modal-price-unit').innerText = p.harga;
+      document.getElementById('modal-date-badge').innerText = `Keberangkatan: ${p.tgl}`;
+      document.getElementById('modal-hotel-makkah').innerText = p.makkah;
+      document.getElementById('modal-hotel-madinah').innerText = p.madinah;
+      document.getElementById('modal-maskapai').innerText = p.maskapai;
+      document.getElementById('modal-img').setAttribute('src', p.foto);
+
+      const incContainer = document.querySelector('#modal-paket .bg-green-50 ul');
+      if (incContainer) {
+        incContainer.innerHTML = '';
+        const fasilitasNodes = document.querySelectorAll('#section-fasilitas h4');
+        if (fasilitasNodes && fasilitasNodes.length > 0) {
+          fasilitasNodes.forEach(node => incContainer.innerHTML += `<li>${node.innerText}</li>`);
+        }
+      }
+
+      const excContainer = document.querySelector('#modal-paket .bg-red-50 ul');
+      if (excContainer) {
+        excContainer.innerHTML = '';
+        const excList = p.exclusions && p.exclusions.length > 0 ? p.exclusions : ["Pembuatan Paspor", "Pengeluaran Pribadi"];
+        excList.forEach(item => excContainer.innerHTML += `<li>${item}</li>`);
+      }
+
+      const taifModalBadge = document.getElementById('modal-taif-badge');
+      if(p.isFreeTaif) taifModalBadge.classList.remove('hidden');
+      else taifModalBadge.classList.add('hidden');
+      
+      document.getElementById('simulasi-pendaftar').value = "2";
+      updateSimulasiHarga();
+
+      const modal = document.getElementById('modal-paket');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function updateSimulasiHarga() {
+      if(!activeModalPaket) return;
+      const data = getData();
+      let cleanWA = (data.kontak.wa || "081234567890").replace(/\D/g, '');
+      if (cleanWA.startsWith('0')) cleanWA = '62' + cleanWA.substring(1);
+
+      const pendaftarCount = parseInt(document.getElementById('simulasi-pendaftar').value);
+      const rawHargaPerOrang = activeModalPaket.rawHarga || 29500000;
+      const totalEstimasi = rawHargaPerOrang * pendaftarCount;
+
+      document.getElementById('total-simulasi-harga').innerText = formatRupiah(totalEstimasi);
+      const waLink = `https://wa.me/${cleanWA}?text=Halo%20Admin%20Comal,%20saya%20ingin%20mendaftar%20paket%20*${encodeURIComponent(activeModalPaket.nama)}*%20untuk%20*${pendaftarCount}%20Orang*`;
+      document.getElementById('modal-wa-btn').setAttribute('href', waLink);
+    }
+
+    function closeModal() {
+      document.getElementById('modal-paket').classList.add('hidden');
+      document.getElementById('modal-paket').classList.remove('flex');
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      const data = getData();
+      let cleanWA = (data.kontak.wa || "081234567890").replace(/\D/g, '');
+      if (cleanWA.startsWith('0')) cleanWA = '62' + cleanWA.substring(1);
+      
+      const nama = document.getElementById('form-nama').value;
+      const wa = document.getElementById('form-wa').value;
+      const pesan = document.getElementById('form-pesan').value;
+      
+      window.open(`https://wa.me/${cleanWA}?text=Assalamu'alaikum%20Admin%20Comal,%20Nama:%20${encodeURIComponent(nama)}%20No%20WA:%20${encodeURIComponent(wa)}%20Pesan:%20${encodeURIComponent(pesan)}`, '_blank');
+    }
+
+    let currentSlide = 0;
+    let sliderTimer = null;
+
+    function initHeroBgSlider() {
+      const data = getData();
+      const heroContainer = document.getElementById('hero-bg-container');
+      const galeriList = data.galeri || defaultData.galeri;
+      if (!galeriList || galeriList.length === 0) return;
+      if (sliderTimer) clearInterval(sliderTimer);
+
+      heroContainer.innerHTML = '';
+      galeriList.forEach((g, index) => {
+        const slideDiv = document.createElement('div');
+        slideDiv.className = `hero-bg-slide ${index === 0 ? 'active' : ''}`;
+        slideDiv.style.backgroundImage = `url('${g.foto}')`;
+        heroContainer.appendChild(slideDiv);
+      });
+
+      const slides = document.querySelectorAll('.hero-bg-slide');
+      if (slides.length <= 1) return;
+
+      currentSlide = 0;
+      sliderTimer = setInterval(() => {
+        slides[currentSlide].classList.remove('active');
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].classList.add('active');
+      }, 5000);
+    }
+
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'lantama_comal_cms') renderPage();
+    });
+
+    renderPage();
+  </script>
+</body>
+</html>

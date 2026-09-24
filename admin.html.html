@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Remote Panel - PT. Lantabur Utama Wisata Cabang Comal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+  <!-- SATPAM LOKAL: JIKA BELUM LOGIN, TENDANG KE LOGIN.HTML -->
+  <script>
+    if (localStorage.getItem('admin_login_session') !== 'true') {
+      window.location.href = "login.html";
+    }
+  </script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
+          colors: { brand: { dark: '#0a2f24', primary: '#0f4c3a', gold: '#c59b27', light: '#f2f7f4' } }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans flex flex-col md:flex-row min-h-screen">
+
+  <!-- Sidebar -->
+  <aside class="w-full md:w-64 bg-brand-dark text-white flex flex-col shrink-0">
+    <div class="p-5 border-b border-gray-800 flex items-center space-x-3">
+      <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center p-1 shrink-0">
+        <img src="image_302356.png" alt="Logo Admin" class="h-full w-auto object-contain" onerror="this.style.display='none'">
+      </div>
+      <div>
+        <h1 class="font-extrabold text-xs leading-tight">ADMIN CONTROL</h1>
+        <p class="text-[9px] text-brand-gold uppercase font-semibold">Lantama Wisata Comal</p>
+      </div>
+    </div>
+
+    <nav class="p-3 space-y-1 text-xs font-medium flex flex-row md:flex-col overflow-x-auto md:overflow-x-visible shrink-0">
+      <button onclick="switchTab('paket')" id="btn-paket" class="flex items-center space-x-2.5 px-3.5 py-2.5 rounded-xl bg-brand-gold text-brand-dark font-bold shrink-0">
+        <i class="fas fa-kaaba w-4"></i><span>Kelola Paket</span>
+      </button>
+      <button onclick="switchTab('notif')" id="btn-notif" class="flex items-center space-x-2.5 px-3.5 py-2.5 rounded-xl text-gray-300 hover:bg-white/10 transition shrink-0">
+        <i class="fas fa-bell w-4"></i><span>Social Proof</span>
+      </button>
+      <button onclick="switchTab('galeri')" id="btn-galeri" class="flex items-center space-x-2.5 px-3.5 py-2.5 rounded-xl text-gray-300 hover:bg-white/10 transition shrink-0">
+        <i class="fas fa-images w-4"></i><span>Galeri Foto</span>
+      </button>
+      <button onclick="switchTab('testimoni')" id="btn-testimoni" class="flex items-center space-x-2.5 px-3.5 py-2.5 rounded-xl text-gray-300 hover:bg-white/10 transition shrink-0">
+        <i class="fas fa-comments w-4"></i><span>Testimoni</span>
+      </button>
+      <button onclick="switchTab('kontak')" id="btn-kontak" class="flex items-center space-x-2.5 px-3.5 py-2.5 rounded-xl text-gray-300 hover:bg-white/10 transition shrink-0">
+        <i class="fas fa-headset w-4"></i><span>Kontak & Rating</span>
+      </button>
+      
+      <!-- MENU LOGOUT DI SIDEBAR (MOBILE & DESKTOP) -->
+      <button onclick="logoutAdmin()" class="flex items-center space-x-2.5 px-3.5 py-2.5 rounded-xl text-red-400 hover:bg-red-500/10 transition shrink-0 mt-auto font-bold">
+        <i class="fas fa-sign-out-alt w-4"></i><span>Logout Panel</span>
+      </button>
+    </nav>
+  </aside>
+
+  <!-- Content Container -->
+  <div class="flex-grow flex flex-col min-w-0">
+    <header class="bg-white shadow-sm border-b px-6 py-4 flex justify-between items-center">
+      <div>
+        <h2 class="text-lg font-bold text-brand-dark">Remote CMS Panel</h2>
+        <p class="text-[11px] text-gray-500">
+          Login sebagai: <span id="display-admin-name" class="text-brand-primary font-bold">Admin</span>
+        </p>
+      </div>
+
+      <div class="flex items-center space-x-2">
+        <button onclick="resetDefaultData()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold px-3 py-1.5 rounded-lg border transition">Reset Data</button>
+        <!-- TOMBOL LOGOUT ATAS HEADER -->
+        <button onclick="logoutAdmin()" class="bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold px-3 py-1.5 rounded-lg border border-red-200 transition flex items-center">
+          <i class="fas fa-sign-out-alt mr-1.5"></i> Logout
+        </button>
+      </div>
+    </header>
+
+    <main class="p-6 flex-grow">
+      <!-- TAB PAKET -->
+      <section id="sec-paket" class="admin-tab">
+        <div class="flex justify-between items-center mb-5">
+          <h3 class="text-base font-bold text-brand-dark">Daftar Paket Keberangkatan</h3>
+          <button onclick="openAddPaketModal()" class="bg-brand-primary text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow hover:bg-brand-dark transition">
+            <i class="fas fa-plus mr-1"></i> Tambah Paket
+          </button>
+        </div>
+        <div class="bg-white rounded-2xl border shadow-sm overflow-x-auto">
+          <table class="w-full text-left border-collapse min-w-[600px]">
+            <thead>
+              <tr class="bg-gray-50 border-b text-[11px] uppercase text-gray-500 font-bold">
+                <th class="p-3.5">Foto & Paket</th>
+                <th class="p-3.5">Bonus Taif</th>
+                <th class="p-3.5">Sisa Seat</th>
+                <th class="p-3.5">Maskapai</th>
+                <th class="p-3.5">Harga</th>
+                <th class="p-3.5 text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="admin-paket-list" class="divide-y text-xs"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB NOTIFIKASI -->
+      <section id="sec-notif" class="admin-tab hidden">
+        <div class="bg-white p-5 rounded-2xl border shadow-sm mb-5 max-w-2xl">
+          <h4 class="font-bold text-brand-dark text-xs mb-2.5"><i class="fas fa-clock text-brand-gold mr-1.5"></i> Timer Pop-up Social Proof</h4>
+          <div class="flex items-center space-x-3">
+            <input id="input-toast-duration" type="number" min="3" max="60" placeholder="8" class="bg-gray-50 border rounded-xl p-2 text-xs font-bold w-24 text-center">
+            <span class="text-xs font-semibold text-gray-600">Detik</span>
+            <button onclick="saveToastDuration()" class="bg-brand-primary text-white font-bold text-xs px-4 py-2 rounded-xl shadow">Simpan</button>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center mb-5 max-w-2xl">
+          <h3 class="text-base font-bold text-brand-dark">Daftar Notifikasi Pendaftar</h3>
+          <button onclick="openAddNotifModal()" class="bg-brand-primary text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow">
+            <i class="fas fa-plus mr-1"></i> Tambah Notif
+          </button>
+        </div>
+        <div id="admin-notif-list" class="space-y-2.5 max-w-2xl"></div>
+      </section>
+
+      <!-- TAB GALERI -->
+      <section id="sec-galeri" class="admin-tab hidden">
+        <div class="flex justify-between items-center mb-5">
+          <h3 class="text-base font-bold text-brand-dark">Kelola Foto Galeri</h3>
+          <button onclick="openAddGaleriModal()" class="bg-brand-primary text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow">
+            <i class="fas fa-upload mr-1"></i> Upload Foto
+          </button>
+        </div>
+        <div id="admin-galeri-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+      </section>
+
+      <!-- TAB TESTIMONI -->
+      <section id="sec-testimoni" class="admin-tab hidden">
+        <div class="flex justify-between items-center mb-5">
+          <h3 class="text-base font-bold text-brand-dark">Kelola Testimoni Jemaah</h3>
+          <button onclick="openAddTestiModal()" class="bg-brand-primary text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow">
+            <i class="fas fa-plus mr-1"></i> Tambah Testimoni
+          </button>
+        </div>
+        <div id="admin-testi-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+      </section>
+
+      <!-- TAB KONTAK -->
+      <section id="sec-kontak" class="admin-tab hidden">
+        <div class="max-w-xl bg-white p-6 rounded-2xl border shadow-sm">
+          <h3 class="text-base font-bold text-brand-dark mb-4">Pengaturan Kontak & Social Proof</h3>
+          <form onsubmit="saveKontak(event)" class="space-y-3 text-xs">
+            <div><label class="block font-bold text-gray-700 uppercase mb-1">Nomor WA Admin</label><input id="input-wa" type="text" required class="w-full bg-gray-50 border rounded-xl p-2.5"></div>
+            <div><label class="block font-bold text-gray-700 uppercase mb-1">Alamat Kantor</label><textarea id="input-alamat" rows="2" required class="w-full bg-gray-50 border rounded-xl p-2.5"></textarea></div>
+            <div><label class="block font-bold text-gray-700 uppercase mb-1">Telepon Kantor</label><input id="input-telp" type="text" required class="w-full bg-gray-50 border rounded-xl p-2.5"></div>
+            <hr class="my-3">
+            <div><label class="block font-bold text-gray-700 uppercase mb-1">Rating Google Bintang</label><input id="input-rating" type="text" class="w-full bg-gray-50 border rounded-xl p-2.5"></div>
+            <div><label class="block font-bold text-gray-700 uppercase mb-1">Link Google Maps</label><input id="input-gmaps-link" type="url" class="w-full bg-gray-50 border rounded-xl p-2.5"></div>
+            <button type="submit" class="bg-brand-primary text-white font-bold px-5 py-2.5 rounded-xl shadow hover:bg-brand-dark transition mt-2">Simpan Kontak</button>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- MODAL EDIT PAKET -->
+  <div id="modal-edit-paket" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closePaketModal()" class="absolute top-3 right-3 text-gray-400 font-bold text-lg">&times;</button>
+      <h3 class="text-lg font-bold text-brand-dark mb-3">Edit / Tambah Paket</h3>
+      
+      <form onsubmit="savePaketForm(event)" class="space-y-2.5 text-xs">
+        <input type="hidden" id="edit-paket-id">
+        <div><label class="block font-bold text-gray-700 uppercase mb-1">Nama Paket</label><input id="edit-nama-paket" type="text" required class="w-full bg-gray-50 border rounded-xl p-2"></div>
+        <div>
+          <label class="block font-bold text-gray-700 uppercase mb-1">Foto Paket</label>
+          <input id="edit-file-paket" type="file" accept="image/*" onchange="previewUploadPaket(event)" class="w-full text-xs bg-gray-50 border rounded-xl p-1.5 cursor-pointer">
+        </div>
+
+        <div id="preview-paket-container" class="hidden border rounded-xl overflow-hidden bg-gray-50 p-2 text-center">
+          <img id="upload-preview-paket-img" src="" class="max-h-28 mx-auto rounded-lg object-contain mb-1.5">
+          <button type="button" onclick="reCropPaketImage()" class="bg-brand-gold text-brand-dark text-[10px] font-bold px-2.5 py-1 rounded-lg">Crop Foto</button>
+        </div>
+
+        <div class="bg-yellow-50 p-2.5 rounded-xl border border-yellow-200 flex items-center justify-between">
+          <label class="font-bold text-brand-dark text-[11px]">Free Taif?</label>
+          <input id="edit-freetaif-paket" type="checkbox" class="w-4 h-4 text-brand-primary rounded">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div><label class="block font-bold text-gray-700 uppercase mb-1">Sisa Seat</label><input id="edit-seat-paket" type="number" required class="w-full bg-gray-50 border rounded-xl p-2"></div>
+          <div><label class="block font-bold text-gray-700 uppercase mb-1">Maskapai</label><input id="edit-maskapai-paket" type="text" required class="w-full bg-gray-50 border rounded-xl p-2"></div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div><label class="block font-bold text-gray-700 uppercase mb-1">Badge Promo</label><input id="edit-badge-paket" type="text" class="w-full bg-gray-50 border rounded-xl p-2"></div>
+          <div><label class="block font-bold text-gray-700 uppercase mb-1">Tanggal</label><input id="edit-tgl-paket" type="text" required class="w-full bg-gray-50 border rounded-xl p-2"></div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div><label class="block font-bold text-gray-700 uppercase mb-1">Harga Display</label><input id="edit-harga-paket" type="text" required class="w-full bg-gray-50 border rounded-xl p-2"></div>
+          <div><label class="block font-bold text-gray-700 uppercase mb-1">Harga Angka Polos</label><input id="edit-rawharga-paket" type="number" required class="w-full bg-gray-50 border rounded-xl p-2"></div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div><label class="block font-bold text-gray-700 uppercase mb-1">Hotel Makkah</label><input id="edit-makkah-paket" type="text" required class="w-full bg-gray-50 border rounded-xl p-2"></div>
+          <div><label class="block font-bold text-gray-700 uppercase mb-1">Hotel Madinah</label><input id="edit-madinah-paket" type="text" required class="w-full bg-gray-50 border rounded-xl p-2"></div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-red-800 uppercase mb-1">Belum Termasuk (Pisahkan Koma)</label>
+          <textarea id="edit-exclusions-paket" rows="2" class="w-full bg-gray-50 border rounded-xl p-2 text-xs"></textarea>
+        </div>
+
+        <button type="submit" class="w-full bg-brand-primary text-white font-bold py-2.5 rounded-xl shadow mt-2">Simpan & Remote Web</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL CROPPER -->
+  <div id="modal-cropper" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4 z-[60]">
+    <div class="bg-white rounded-2xl max-w-md w-full p-4 shadow-2xl relative flex flex-col">
+      <h3 class="text-sm font-bold text-brand-dark mb-2">Crop Foto Paket</h3>
+      <div class="max-h-[280px] w-full overflow-hidden bg-gray-900 rounded-xl mb-3 flex items-center justify-center">
+        <img id="cropper-target-img" src="" class="max-w-full">
+      </div>
+      <div class="flex justify-between gap-2">
+        <button type="button" onclick="rotateCropper(-90)" class="bg-gray-100 text-xs font-bold px-3 py-1.5 rounded-lg"><i class="fas fa-undo"></i> Putar</button>
+        <div class="flex space-x-1.5">
+          <button type="button" onclick="closeCropperModal()" class="bg-gray-200 text-xs font-bold px-3 py-1.5 rounded-lg">Batal</button>
+          <button type="button" onclick="applyCropImage()" class="bg-brand-primary text-white text-xs font-bold px-4 py-1.5 rounded-lg shadow">Terapkan Crop</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL NOTIFIKASI -->
+  <div id="modal-edit-notif" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl relative">
+      <button onclick="closeNotifModal()" class="absolute top-3 right-3 text-gray-400 font-bold text-lg">&times;</button>
+      <h3 class="text-base font-bold text-brand-dark mb-3">Tambah Notifikasi</h3>
+      <form onsubmit="saveNotifForm(event)" class="space-y-3 text-xs">
+        <div><label class="block font-bold text-gray-700 uppercase mb-1">Teks Notifikasi</label><textarea id="edit-text-notif" rows="2" required class="w-full bg-gray-50 border rounded-xl p-2"></textarea></div>
+        <div><label class="block font-bold text-gray-700 uppercase mb-1">Waktu</label><input id="edit-time-notif" type="text" required class="w-full bg-gray-50 border rounded-xl p-2"></div>
+        <button type="submit" class="w-full bg-brand-primary text-white font-bold py-2.5 rounded-xl shadow">Simpan</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL TESTIMONI -->
+  <div id="modal-edit-testi" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl relative">
+      <button onclick="closeTestiModal()" class="absolute top-3 right-3 text-gray-400 font-bold text-lg">&times;</button>
+      <h3 class="text-base font-bold text-brand-dark mb-3">Tambah Testimoni</h3>
+      <form onsubmit="saveTestiForm(event)" class="space-y-2.5 text-xs">
+        <div><label class="block font-bold text-gray-700 uppercase mb-1">Nama Jemaah</label><input id="edit-nama-testi" type="text" required class="w-full bg-gray-50 border rounded-xl p-2"></div>
+        <div><label class="block font-bold text-gray-700 uppercase mb-1">Asal</label><input id="edit-asal-testi" type="text" required class="w-full bg-gray-50 border rounded-xl p-2"></div>
+        <div><label class="block font-bold text-gray-700 uppercase mb-1">Foto (URL)</label><input id="edit-foto-testi" type="url" required class="w-full bg-gray-50 border rounded-xl p-2"></div>
+        <div><label class="block font-bold text-gray-700 uppercase mb-1">Ulasan</label><textarea id="edit-ulasan-testi" rows="2" required class="w-full bg-gray-50 border rounded-xl p-2"></textarea></div>
+        <button type="submit" class="w-full bg-brand-primary text-white font-bold py-2.5 rounded-xl shadow">Simpan Testimoni</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL GALERI -->
+  <div id="modal-edit-galeri" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl relative">
+      <button onclick="closeGaleriModal()" class="absolute top-3 right-3 text-gray-400 font-bold text-lg">&times;</button>
+      <h3 class="text-base font-bold text-brand-dark mb-3">Upload Foto Galeri</h3>
+      <form onsubmit="saveGaleriForm(event)" class="space-y-3 text-xs">
+        <div><label class="block font-bold text-gray-700 uppercase mb-1">File Foto</label><input id="edit-file-galeri" type="file" accept="image/*" onchange="previewUploadGaleri(event)" class="w-full bg-gray-50 border rounded-xl p-1.5 cursor-pointer"></div>
+        <div id="preview-container" class="hidden border rounded-xl overflow-hidden bg-gray-50 p-1.5 text-center">
+          <img id="upload-preview-img" src="" class="max-h-28 mx-auto rounded-lg object-contain">
+        </div>
+        <div><label class="block font-bold text-gray-700 uppercase mb-1">Judul</label><input id="edit-judul-galeri" type="text" required class="w-full bg-gray-50 border rounded-xl p-2"></div>
+        <div><label class="block font-bold text-gray-700 uppercase mb-1">Lokasi</label><input id="edit-lokasi-galeri" type="text" required class="w-full bg-gray-50 border rounded-xl p-2"></div>
+        <div><label class="block font-bold text-gray-700 uppercase mb-1">Keterangan</label><textarea id="edit-ket-galeri" rows="2" required class="w-full bg-gray-50 border rounded-xl p-2"></textarea></div>
+        <button type="submit" class="w-full bg-brand-primary text-white font-bold py-2.5 rounded-xl shadow">Simpan Foto</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- LOGIKA SCRIPT ADMIN -->
+  <script>
+    const defaultData = {
+      kontak: { wa: "081234567890", alamat: "Jl. Raya Comal No. 88, Kuto, Kec. Comal, Pemalang", telp: "(0285) 4488-9900", rating: "4.9", gmapsLink: "https://maps.google.com" },
+      toastDuration: 8,
+      pendaftarNotif: [
+        { text: "Bpk. H. Ahmad dari Ulujami baru saja mendaftar Paket Umrah VIP (2 Orang)", time: "12 menit yang lalu" },
+        { text: "Ibu Hj. Siti dari Comal mendaftar Paket Umrah Reguler (3 Orang)", time: "35 menit yang lalu" }
+      ],
+      paket: [
+        { id: 1, nama: "Umrah Reguler 9 Hari", tgl: "15 Oktober 2026", harga: "Rp 29,5 Jt", rawHarga: 29500000, makkah: "Al Kiswah Tower", madinah: "Concorde Hotel", maskapai: "Saudia Airlines (Direct)", foto: "https://images.unsplash.com/photo-1565552070098-fd83a8dac718?auto=format&fit=crop&q=80", badge: "SUPER HEMAT", isFreeTaif: true, seatRemaining: 3, exclusions: ["Pembuatan Paspor", "Suntik Vaksin Meningitis", "Pengeluaran Pribadi"] },
+        { id: 2, nama: "Umrah VIP Bintang 5 (12 Hari)", tgl: "20 November 2026", harga: "Rp 38,9 Jt", rawHarga: 38900000, makkah: "Pullman Zamzam", madinah: "Frontel Al Harithia", maskapai: "Garuda Indonesia Direct", foto: "https://images.unsplash.com/photo-1591604466107-ec97de577aff?auto=format&fit=crop&q=80", badge: "BINTANG 5 VIP", isFreeTaif: true, seatRemaining: 5, exclusions: ["Pembuatan Paspor", "Suntik Vaksin Meningitis", "Pengeluaran Pribadi"] }
+      ],
+      galeri: [{ id: 1, judul: "Tawaf Bersama Jemaah Comal", lokasi: "Masjidil Haram Makkah", ket: "Dokumentasi kebersamaan jemaah Cabang Comal saat Tawaf di depan Ka'bah.", foto: "https://images.unsplash.com/photo-1591604466107-ec97de577aff?auto=format&fit=crop&q=80" }],
+      testimoni: [{ id: 1, nama: "Ibu Hj. Siti Nurjanah", asal: "Kuto, Comal", ulasan: "Alhamdulillah bimbingan ibadah sangat sabar, hotel dekat sekali dengan Masjidil Haram.", foto: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80" }]
+    };
+
+    let uploadedBase64Galeri = "";
+    let uploadedBase64Paket = "";
+    let rawPaketImageSource = "";
+    let cropperInstance = null;
+
+    // FUNGSI LOGOUT LOKAL
+    function logoutAdmin() {
+      if (confirm('Apakah Anda yakin ingin keluar dari Admin Panel?')) {
+        localStorage.removeItem('admin_login_session');
+        localStorage.removeItem('admin_username');
+        window.location.href = "login.html";
+      }
+    }
+
+    function loadData() {
+      const saved = localStorage.getItem('lantama_comal_cms');
+      return saved ? JSON.parse(saved) : defaultData;
+    }
+
+    function saveData(data) {
+      localStorage.setItem('lantama_comal_cms', JSON.stringify(data));
+      renderAdmin();
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.admin-tab').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`sec-${tabId}`).classList.remove('hidden');
+      document.querySelectorAll('nav button').forEach(btn => btn.className = "flex items-center space-x-2.5 px-3.5 py-2.5 rounded-xl text-gray-300 hover:bg-white/10 transition shrink-0");
+      document.getElementById(`btn-${tabId}`).className = "flex items-center space-x-2.5 px-3.5 py-2.5 rounded-xl bg-brand-gold text-brand-dark font-bold shrink-0";
+    }
+
+    function renderAdmin() {
+      // Tampilkan username admin yang sedang aktif
+      const savedUsername = localStorage.getItem('admin_username') || "admincomal";
+      document.getElementById('display-admin-name').innerText = savedUsername;
+
+      const data = loadData();
+      
+      const paketBody = document.getElementById('admin-paket-list');
+      paketBody.innerHTML = '';
+      data.paket.forEach(p => {
+        paketBody.innerHTML += `
+          <tr class="hover:bg-gray-50">
+            <td class="p-3.5 flex items-center space-x-3">
+              <img src="${p.foto}" class="w-10 h-10 rounded-lg object-cover shrink-0">
+              <div><strong class="text-brand-dark block text-xs">${p.nama}</strong><span class="text-[9px] bg-brand-gold/20 text-brand-dark px-1.5 py-0.5 rounded font-bold">${p.badge}</span></div>
+            </td>
+            <td class="p-3.5 font-bold">${p.isFreeTaif ? '<span class="text-green-600">Ya</span>' : '<span class="text-gray-400">Tidak</span>'}</td>
+            <td class="p-3.5 font-bold text-red-600">${p.seatRemaining || 3} Seat</td>
+            <td class="p-3.5 font-semibold text-brand-primary">${p.maskapai}</td>
+            <td class="p-3.5 font-extrabold text-brand-dark">${p.harga}</td>
+            <td class="p-3.5 text-center space-x-2">
+              <button onclick="editPaket(${p.id})" class="text-blue-600 font-bold"><i class="fas fa-edit"></i></button>
+              <button onclick="deletePaket(${p.id})" class="text-red-600 font-bold"><i class="fas fa-trash"></i></button>
+            </td>
+          </tr>
+        `;
+      });
+
+      document.getElementById('input-toast-duration').value = data.toastDuration || 8;
+
+      const notifList = document.getElementById('admin-notif-list');
+      notifList.innerHTML = '';
+      (data.pendaftarNotif || defaultData.pendaftarNotif).forEach((n, idx) => {
+        notifList.innerHTML += `
+          <div class="bg-white rounded-xl border p-3 shadow-sm flex items-center justify-between">
+            <div>
+              <p class="font-bold text-brand-dark text-xs">${n.text}</p>
+              <span class="text-[10px] text-gray-400 font-semibold">${n.time}</span>
+            </div>
+            <button onclick="deleteNotif(${idx})" class="text-red-600 text-xs font-bold ml-2"><i class="fas fa-trash"></i></button>
+          </div>
+        `;
+      });
+
+      const galeriList = document.getElementById('admin-galeri-list');
+      galeriList.innerHTML = '';
+      (data.galeri || defaultData.galeri).forEach(g => {
+        galeriList.innerHTML += `
+          <div class="bg-white rounded-xl border p-3.5 shadow-sm">
+            <img src="${g.foto}" class="w-full h-32 object-cover rounded-lg mb-2">
+            <span class="text-[9px] font-bold uppercase bg-brand-gold/20 text-brand-dark px-2 py-0.5 rounded">${g.lokasi}</span>
+            <h4 class="font-bold text-brand-dark mt-1 text-xs">${g.judul}</h4>
+            <div class="mt-2 pt-2 border-t flex justify-end">
+              <button onclick="deleteGaleri(${g.id})" class="text-red-600 text-xs font-bold"><i class="fas fa-trash"></i> Hapus</button>
+            </div>
+          </div>
+        `;
+      });
+
+      const testiList = document.getElementById('admin-testi-list');
+      testiList.innerHTML = '';
+      (data.testimoni || defaultData.testimoni).forEach(t => {
+        testiList.innerHTML += `
+          <div class="bg-white rounded-xl border p-3.5 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="flex items-center space-x-2.5 mb-2">
+                <img src="${t.foto}" class="w-7 h-7 rounded-full object-cover">
+                <div>
+                  <h4 class="font-bold text-brand-dark text-xs">${t.nama}</h4>
+                  <span class="text-[9px] text-gray-400 block">${t.asal}</span>
+                </div>
+              </div>
+              <p class="text-xs text-gray-600 italic">"${t.ulasan}"</p>
+            </div>
+            <div class="mt-3 pt-2 border-t flex justify-end">
+              <button onclick="deleteTesti(${t.id})" class="text-red-600 text-xs font-bold"><i class="fas fa-trash"></i> Hapus</button>
+            </div>
+          </div>
+        `;
+      });
+
+      document.getElementById('input-wa').value = data.kontak.wa;
+      document.getElementById('input-alamat').value = data.kontak.alamat;
+      document.getElementById('input-telp').value = data.kontak.telp;
+      document.getElementById('input-rating').value = data.kontak.rating || "4.9";
+      document.getElementById('input-gmaps-link').value = data.kontak.gmapsLink || "https://maps.google.com";
+    }
+
+    function saveToastDuration() {
+      const data = loadData();
+      data.toastDuration = parseInt(document.getElementById('input-toast-duration').value) || 8;
+      saveData(data);
+      alert('Durasi pop-up berhasil diperbarui!');
+    }
+
+    function openAddNotifModal() {
+      document.getElementById('edit-text-notif').value = '';
+      document.getElementById('edit-time-notif').value = 'Beberapa menit yang lalu';
+      document.getElementById('modal-edit-notif').classList.remove('hidden');
+      document.getElementById('modal-edit-notif').classList.add('flex');
+    }
+
+    function closeNotifModal() {
+      document.getElementById('modal-edit-notif').classList.add('hidden');
+      document.getElementById('modal-edit-notif').classList.remove('flex');
+    }
+
+    function saveNotifForm(e) {
+      e.preventDefault();
+      const data = loadData();
+      if(!data.pendaftarNotif) data.pendaftarNotif = [];
+      data.pendaftarNotif.push({ text: document.getElementById('edit-text-notif').value, time: document.getElementById('edit-time-notif').value });
+      saveData(data);
+      closeNotifModal();
+    }
+
+    function deleteNotif(idx) {
+      if(!confirm('Hapus notifikasi ini?')) return;
+      const data = loadData();
+      data.pendaftarNotif.splice(idx, 1);
+      saveData(data);
+    }
+
+    function previewUploadPaket(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          rawPaketImageSource = e.target.result;
+          openCropperModal(rawPaketImageSource);
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function openCropperModal(imgSrc) {
+      const modal = document.getElementById('modal-cropper');
+      const cropperImg = document.getElementById('cropper-target-img');
+      cropperImg.src = imgSrc;
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
+      if (cropperInstance) cropperInstance.destroy();
+      cropperInstance = new Cropper(cropperImg, { aspectRatio: 16 / 9, viewMode: 1, autoCropArea: 1, responsive: true });
+    }
+
+    function rotateCropper(degree) {
+      if (cropperInstance) cropperInstance.rotate(degree);
+    }
+
+    function closeCropperModal() {
+      document.getElementById('modal-cropper').classList.add('hidden');
+      document.getElementById('modal-cropper').classList.remove('flex');
+    }
+
+    function applyCropImage() {
+      if (!cropperInstance) return;
+      const canvas = cropperInstance.getCroppedCanvas({ width: 800, height: 450 });
+      uploadedBase64Paket = canvas.toDataURL('image/jpeg', 0.85);
+      document.getElementById('upload-preview-paket-img').setAttribute('src', uploadedBase64Paket);
+      document.getElementById('preview-paket-container').classList.remove('hidden');
+      closeCropperModal();
+    }
+
+    function reCropPaketImage() {
+      if (rawPaketImageSource) openCropperModal(rawPaketImageSource);
+    }
+
+    function openAddPaketModal() {
+      uploadedBase64Paket = "";
+      rawPaketImageSource = "";
+      document.getElementById('edit-file-paket').value = "";
+      document.getElementById('preview-paket-container').classList.add('hidden');
+      document.getElementById('edit-paket-id').value = '';
+      document.getElementById('edit-nama-paket').value = '';
+      document.getElementById('edit-freetaif-paket').checked = true;
+      document.getElementById('edit-seat-paket').value = '3';
+      document.getElementById('edit-maskapai-paket').value = 'Saudia Airlines (Direct)';
+      document.getElementById('edit-badge-paket').value = 'SUPER HEMAT';
+      document.getElementById('edit-tgl-paket').value = '';
+      document.getElementById('edit-harga-paket').value = 'Rp 29,5 Jt';
+      document.getElementById('edit-rawharga-paket').value = '29500000';
+      document.getElementById('edit-makkah-paket').value = '';
+      document.getElementById('edit-madinah-paket').value = '';
+      document.getElementById('edit-exclusions-paket').value = 'Pembuatan Paspor, Suntik Vaksin Meningitis, Pengeluaran Pribadi';
+      document.getElementById('modal-edit-paket').classList.remove('hidden');
+      document.getElementById('modal-edit-paket').classList.add('flex');
+    }
+
+    function editPaket(id) {
+      const data = loadData();
+      const p = data.paket.find(x => x.id === id);
+      if(!p) return;
+
+      uploadedBase64Paket = p.foto;
+      rawPaketImageSource = p.foto;
+
+      document.getElementById('edit-file-paket').value = "";
+      document.getElementById('upload-preview-paket-img').setAttribute('src', p.foto);
+      document.getElementById('preview-paket-container').classList.remove('hidden');
+
+      document.getElementById('edit-paket-id').value = p.id;
+      document.getElementById('edit-nama-paket').value = p.nama;
+      document.getElementById('edit-freetaif-paket').checked = p.isFreeTaif !== false;
+      document.getElementById('edit-seat-paket').value = p.seatRemaining || 3;
+      document.getElementById('edit-maskapai-paket').value = p.maskapai;
+      document.getElementById('edit-badge-paket').value = p.badge || '';
+      document.getElementById('edit-tgl-paket').value = p.tgl;
+      document.getElementById('edit-harga-paket').value = p.harga;
+      document.getElementById('edit-rawharga-paket').value = p.rawHarga || 29500000;
+      document.getElementById('edit-makkah-paket').value = p.makkah;
+      document.getElementById('edit-madinah-paket').value = p.madinah;
+      document.getElementById('edit-exclusions-paket').value = (p.exclusions || []).join(', ');
+
+      document.getElementById('modal-edit-paket').classList.remove('hidden');
+      document.getElementById('modal-edit-paket').classList.add('flex');
+    }
+
+    function closePaketModal() {
+      document.getElementById('modal-edit-paket').classList.add('hidden');
+      document.getElementById('modal-edit-paket').classList.remove('flex');
+    }
+
+    function savePaketForm(e) {
+      e.preventDefault();
+      if (!uploadedBase64Paket) {
+        alert('Pilih dan crop foto paket terlebih dahulu!');
+        return;
+      }
+
+      const data = loadData();
+      const id = parseInt(document.getElementById('edit-paket-id').value);
+      const exclusionsArr = document.getElementById('edit-exclusions-paket').value.split(',').map(s => s.trim()).filter(Boolean);
+
+      const newPaket = {
+        id: id || Date.now(),
+        nama: document.getElementById('edit-nama-paket').value,
+        isFreeTaif: document.getElementById('edit-freetaif-paket').checked,
+        seatRemaining: parseInt(document.getElementById('edit-seat-paket').value),
+        maskapai: document.getElementById('edit-maskapai-paket').value,
+        foto: uploadedBase64Paket,
+        badge: document.getElementById('edit-badge-paket').value,
+        tgl: document.getElementById('edit-tgl-paket').value,
+        harga: document.getElementById('edit-harga-paket').value,
+        rawHarga: parseInt(document.getElementById('edit-rawharga-paket').value),
+        makkah: document.getElementById('edit-makkah-paket').value,
+        madinah: document.getElementById('edit-madinah-paket').value,
+        exclusions: exclusionsArr
+      };
+
+      const targetIndex = data.paket.findIndex(x => x.id === id);
+      if(targetIndex >= 0) data.paket[targetIndex] = newPaket;
+      else data.paket.push(newPaket);
+
+      saveData(data);
+      closePaketModal();
+    }
+
+    function deletePaket(id) {
+      if(!confirm('Hapus paket ini?')) return;
+      const data = loadData();
+      data.paket = data.paket.filter(x => x.id !== id);
+      saveData(data);
+    }
+
+    function openAddTestiModal() {
+      document.getElementById('edit-nama-testi').value = '';
+      document.getElementById('edit-asal-testi').value = 'Comal, Pemalang';
+      document.getElementById('edit-foto-testi').value = 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80';
+      document.getElementById('edit-ulasan-testi').value = '';
+      document.getElementById('modal-edit-testi').classList.remove('hidden');
+      document.getElementById('modal-edit-testi').classList.add('flex');
+    }
+
+    function closeTestiModal() {
+      document.getElementById('modal-edit-testi').classList.add('hidden');
+      document.getElementById('modal-edit-testi').classList.remove('flex');
+    }
+
+    function saveTestiForm(e) {
+      e.preventDefault();
+      const data = loadData();
+      if(!data.testimoni) data.testimoni = [];
+      data.testimoni.push({
+        id: Date.now(),
+        nama: document.getElementById('edit-nama-testi').value,
+        asal: document.getElementById('edit-asal-testi').value,
+        foto: document.getElementById('edit-foto-testi').value,
+        ulasan: document.getElementById('edit-ulasan-testi').value
+      });
+      saveData(data);
+      closeTestiModal();
+    }
+
+    function deleteTesti(id) {
+      if(!confirm('Hapus testimoni ini?')) return;
+      const data = loadData();
+      data.testimoni = data.testimoni.filter(x => x.id !== id);
+      saveData(data);
+    }
+
+    function previewUploadGaleri(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          uploadedBase64Galeri = e.target.result;
+          document.getElementById('upload-preview-img').setAttribute('src', uploadedBase64Galeri);
+          document.getElementById('preview-container').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function openAddGaleriModal() {
+      uploadedBase64Galeri = "";
+      document.getElementById('edit-file-galeri').value = "";
+      document.getElementById('preview-container').classList.add('hidden');
+      document.getElementById('edit-judul-galeri').value = '';
+      document.getElementById('edit-lokasi-galeri').value = 'Makkah Al-Mukarramah';
+      document.getElementById('edit-ket-galeri').value = '';
+      document.getElementById('modal-edit-galeri').classList.remove('hidden');
+      document.getElementById('modal-edit-galeri').classList.add('flex');
+    }
+
+    function closeGaleriModal() {
+      document.getElementById('modal-edit-galeri').classList.add('hidden');
+      document.getElementById('modal-edit-galeri').classList.remove('flex');
+    }
+
+    function saveGaleriForm(e) {
+      e.preventDefault();
+      if (!uploadedBase64Galeri) {
+        alert('Pilih foto terlebih dahulu!');
+        return;
+      }
+      const data = loadData();
+      if(!data.galeri) data.galeri = [];
+      data.galeri.push({
+        id: Date.now(),
+        judul: document.getElementById('edit-judul-galeri').value,
+        lokasi: document.getElementById('edit-lokasi-galeri').value,
+        foto: uploadedBase64Galeri,
+        ket: document.getElementById('edit-ket-galeri').value
+      });
+      saveData(data);
+      closeGaleriModal();
+    }
+
+    function deleteGaleri(id) {
+      if(!confirm('Hapus foto ini?')) return;
+      const data = loadData();
+      data.galeri = data.galeri.filter(x => x.id !== id);
+      saveData(data);
+    }
+
+    function saveKontak(e) {
+      e.preventDefault();
+      const data = loadData();
+      data.kontak = {
+        wa: document.getElementById('input-wa').value,
+        alamat: document.getElementById('input-alamat').value,
+        telp: document.getElementById('input-telp').value,
+        rating: document.getElementById('input-rating').value,
+        gmapsLink: document.getElementById('input-gmaps-link').value
+      };
+      saveData(data);
+      alert('Kontak berhasil disimpan!');
+    }
+
+    function resetDefaultData() {
+      if(confirm('Reset ke data awal?')) saveData(defaultData);
+    }
+
+    renderAdmin();
+  </script>
+</body>
+</html>
